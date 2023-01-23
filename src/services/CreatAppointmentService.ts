@@ -1,32 +1,32 @@
 import Appointment from "../models/Appontment";
 import { startOfHour} from 'date-fns';
-import { getRepository } from "typeorm";
+import { getCustomRepository } from "typeorm";
 import AppointmentsRepository from "../repositories/AppointmentsRepository";
 
 interface Request {
-    provider: string;
+    provider_id: string;
     date: Date;
 }
 
 class CreatAppointmemtService {
   
-    public async execute({provider, date}:Request): Promise <Appointment> {
-        const appointmentsRepository = getRepository(AppointmentsRepository);
+    public async execute({provider_id, date}:Request): Promise <Appointment> {
+        const appointmentsRepository = getCustomRepository(AppointmentsRepository);
 
         const appointmentDate = startOfHour(date);
 
-        const findAppointmentInSameDate = appointmentsRepository.findOne(
+        const findAppointmentInSameDate = await appointmentsRepository.findByDate(
             appointmentDate,
         );
 
-        if (findAppointmentInSameDate) {
+        if (findAppointmentInSameDate ) {
             throw Error('Já existe')
             
         }
 
 
-        const appointment = appointmentsRepository.create({
-            provider ,
+        const appointment = await appointmentsRepository.create({
+            provider_id ,
             date: appointmentDate,
         });
 
